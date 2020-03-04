@@ -143,4 +143,4 @@ server <- function(input, output) {
   
 }
 
-return(shinyApp(ui = ui, server = server, options=list(width=1200, height=900)))
+shinyApp(ui = ui, server = server, options=list(width=1200, height=900))
