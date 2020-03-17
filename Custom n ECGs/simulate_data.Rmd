@@ -26,36 +26,41 @@ ui <- fluidPage(
   downloadButton("downloadData", "Download"),
   
   fluidRow(
-    column(1),
-    column(2,
-      h4("Curve #1 (P)"),
-      numericInput(inputId = "curve_1_amplitude", label = "Amplitude", value = .2, step = 0.1),
-      numericInput(inputId = "curve_1_position", label = "Position", min = 0, max = 1.5, value = 0.25, step = 0.01),
-      numericInput(inputId = "curve_1_width", label = "Width", min = 0.001, max = 2, value = 0.031, step = 0.01)
+    column(1,
+      h3("Curve"),
+      h3('Mean'),
+      h3('Height'),
+      h3('Width')
     ),
     column(2,
-      h4("Curve #2 (Q)"),
-      numericInput(inputId = "curve_2_amplitude", label = "Amplitude", value = -.3, step = 0.1),
-      numericInput(inputId = "curve_2_position", label = "Position", min = 0, max = 1.5, value = .35, step = 0.01),
-      numericInput(inputId = "curve_2_width", label = "Width", min = 0.001, max = 2, value = 0.01, step = 0.01)
+      h3("#1"),
+      numericInput(inputId = "curve_1_mean", label = NULL, min = 0, max = 1.5, value = 0.25, step = 0.01),
+      numericInput(inputId = "curve_1_height", label = NULL, value = .2, step = 0.1),
+      numericInput(inputId = "curve_1_width", label = NULL, min = 0.001, max = 2, value = 0.031, step = 0.01)
     ),
     column(2,
-      h4("Curve #3 (R)"),
-      numericInput(inputId = "curve_3_amplitude", label = "Amplitude", value = 3.23, step = 0.1),
-      numericInput(inputId = "curve_3_position", label = "Position", min = 0, max = 1.5, value = .375, step = 0.01),
-      numericInput(inputId = "curve_3_width", label = "Width", min = 0.001, max = 2, value = 0.01, step = 0.01)
+      h3("#2"),
+      numericInput(inputId = "curve_2_mean", label = NULL, min = 0, max = 1.5, value = .35, step = 0.01),
+      numericInput(inputId = "curve_2_height", label = NULL, value = -.3, step = 0.1),
+      numericInput(inputId = "curve_2_width", label = NULL, min = 0.001, max = 2, value = 0.01, step = 0.01)
     ),
     column(2,
-      h4("Curve #4 (S)"),
-      numericInput(inputId = "curve_4_amplitude", label = "Amplitude", value = -.1, step = 0.1),
-      numericInput(inputId = "curve_4_position", label = "Position", min = 0, max = 1.5, value = .45, step = 0.01),
-      numericInput(inputId = "curve_4_width", label = "Width", min = 0.001, max = 2, value = 0.031, step = 0.01)
+      h3("#3"),
+      numericInput(inputId = "curve_3_mean", label = NULL, min = 0, max = 1.5, value = .375, step = 0.01),
+      numericInput(inputId = "curve_3_height", label = NULL, value = 3.23, step = 0.1),
+      numericInput(inputId = "curve_3_width", label = NULL, min = 0.001, max = 2, value = 0.01, step = 0.01)
     ),
     column(2,
-      h4("Curve #5 (T)"),
-      numericInput(inputId = "curve_5_amplitude", label = "Amplitude", value = .31, step = 0.1),
-      numericInput(inputId = "curve_5_position", label = "Position", min = 0, max = 1.5, value = .68, step = 0.01),
-      numericInput(inputId = "curve_5_width", label = "Width", min = 0.001, max = 2, value = 0.031, step = 0.01)
+      h3("#4"),
+      numericInput(inputId = "curve_4_mean", label = NULL, min = 0, max = 1.5, value = .45, step = 0.01),
+      numericInput(inputId = "curve_4_height", label = NULL, value = -.1, step = 0.1),
+      numericInput(inputId = "curve_4_width", label = NULL, min = 0.001, max = 2, value = 0.031, step = 0.01)
+    ),
+    column(2,
+      h3("#5"),
+      numericInput(inputId = "curve_5_mean", label = NULL, min = 0, max = 1.5, value = .68, step = 0.01),
+      numericInput(inputId = "curve_5_height", label = NULL, value = .31, step = 0.1),
+      numericInput(inputId = "curve_5_width", label = NULL, min = 0.001, max = 2, value = 0.031, step = 0.01)
     )
   )
 )
@@ -69,8 +74,8 @@ server <- function(input, output, session) {
   
     # We use the function peak() to define our own bell curve function
     # Motivation: Define our own bell curve function instead of dnorm so that we don't have to fight the function always trying to integrate to 0. 
-    peak <- function(x, amplitude = 1, position = 50, width = 1) {   
-      amplitude * exp(-((x - position)^2)/(2*width^2))
+    peak <- function(x, height = 1, mean = 50, width = 1) {   
+      height * exp(-((x - mean)^2)/(2*width^2))
     }
     
     # x value range
@@ -82,24 +87,24 @@ server <- function(input, output, session) {
     # Function that creates user-defined curve
     newCurveFunc <- function(param_vector, time_vector){
       normal1 <- peak(time_vector,
-                      amplitude = param_vector["curve_1_amplitude"],
-                      position = param_vector["curve_1_position"],
+                      height = param_vector["curve_1_height"],
+                      mean = param_vector["curve_1_mean"],
                       width = param_vector["curve_1_width"])
       normal2 <- peak(time_vector,
-                      amplitude = param_vector["curve_2_amplitude"],
-                      position = param_vector["curve_2_position"],
+                      height = param_vector["curve_2_height"],
+                      mean = param_vector["curve_2_mean"],
                       width = param_vector["curve_2_width"])
       normal3 <- peak(time_vector,
-                      amplitude = param_vector["curve_3_amplitude"],
-                      position = param_vector["curve_3_position"],
+                      height = param_vector["curve_3_height"],
+                      mean = param_vector["curve_3_mean"],
                       width = param_vector["curve_3_width"])
       normal4 <- peak(time_vector,
-                      amplitude = param_vector["curve_4_amplitude"],
-                      position = param_vector["curve_4_position"],
+                      height = param_vector["curve_4_height"],
+                      mean = param_vector["curve_4_mean"],
                       width = param_vector["curve_4_width"])
       normal5 <- peak(time_vector,
-                      amplitude = param_vector["curve_5_amplitude"],
-                      position = param_vector["curve_5_position"],
+                      height = param_vector["curve_5_height"],
+                      mean = param_vector["curve_5_mean"],
                       width = param_vector["curve_5_width"])
       return(normal1 + normal2 + normal3 + normal4 + normal5)
     }
